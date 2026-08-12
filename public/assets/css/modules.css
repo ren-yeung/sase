@@ -159,21 +159,6 @@
 .score-hero { text-align: center; padding: 30px 20px; }
 .score-num { font-size: 54px; font-weight: 700; line-height: 1; font-family: var(--font-num); }
 
-/* 知识卡片 */
-.kcard { display: flex; flex-direction: column; height: 100%; }
-.kcard-top { padding: 15px 17px 12px; border-bottom: 1px solid var(--ink-100); }
-.kcard-name { font-size: 15.5px; font-weight: 600; color: var(--ink-900); margin-bottom: 3px; }
-.kcard-cat { font-size: 11.5px; color: var(--ink-500); }
-.kcard-sec { padding: 12px 17px; border-bottom: 1px solid var(--ink-100); }
-.kcard-sec:last-child { border-bottom: none; }
-.kcard-sec h5 {
-  font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px;
-  color: var(--ink-400); margin: 0 0 7px; font-weight: 600;
-}
-.kcard-sec p, .kcard-sec ul { font-size: 13px; margin: 0; color: var(--ink-700); line-height: 1.65; }
-.kcard-sec ul { padding-left: 17px; }
-.kcard-sec li { margin-bottom: 4px; }
-
 /* 实战场景 */
 .sim-brief {
   background: linear-gradient(135deg, #0b5fec, #1890ff); color: #fff;

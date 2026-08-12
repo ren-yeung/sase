@@ -86,10 +86,10 @@ var Learn = (function () {
       var cat = (DB.categories || []).filter(function (c) { return c.id === p.cat; })[0];
       var hl = p.highlights ? p.highlights[0] : { k: '', v: '' };
       return '' +
-        '<a class="kcard" href="#/products/' + p.id + '">' +
-          '<div class="kcard-ico" style="color:var(--' + (cat ? cat.color : 'brand') + ')">' + ui.icon(cat ? cat.icon : 'globe', 20) + '</div>' +
-          '<div class="kcard-txt"><b>' + ui.esc(p.name) + '</b><span>' + ui.esc(p.tagline) + '</span></div>' +
-          '<div class="kcard-hl">' + ui.esc(hl.k) + ' <b>' + ui.esc(hl.v) + '</b></div>' +
+        '<a class="pkcard" href="#/products/' + p.id + '">' +
+          '<div class="pkcard-ico" style="color:var(--' + (cat ? cat.color : 'brand') + ')">' + ui.icon(cat ? cat.icon : 'globe', 22) + '</div>' +
+          '<div class="pkcard-txt"><b>' + ui.esc(p.name) + '</b><span>' + ui.esc(p.tagline) + '</span></div>' +
+          '<div class="pkcard-hl">' + ui.esc(hl.k) + ' <b>' + ui.esc(hl.v) + '</b></div>' +
         '</a>';
     }).join('');
 
@@ -111,7 +111,7 @@ var Learn = (function () {
       '<div class="learn-grid">' + courseCards + '</div>' +
       '<section class="sec">' +
         '<div class="sec-head"><h2>' + ui.icon('spark', 20) + '产品知识卡片 · 速查</h2><a class="sec-more" href="#/products">查看全部产品 ' + ui.icon('arrow', 16) + '</a></div>' +
-        '<div class="kcard-grid">' + kcards + '</div>' +
+        '<div class="pkcard-grid">' + kcards + '</div>' +
       '</section>' +
       '<section class="sec">' +
         '<div class="sec-head"><h2>' + ui.icon('play', 20) + '实战场景模拟</h2><span class="sec-sub">选对产品组合，理解取舍逻辑</span></div>' +

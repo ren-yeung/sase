@@ -319,16 +319,6 @@ table.tbl tbody tr:hover { background: #FAFBFE; }
 .course-best { font-size: 12.5px; color: var(--ink-500); }
 .course-best b { color: var(--success); }
 
-.kcard-grid { gap: 16px; }
-.kcard {
-  border-radius: var(--r-card); padding: 16px 18px; box-shadow: var(--sh-card);
-  border: 1px solid var(--border); transition: all .18s var(--ease);
-}
-.kcard:hover { border-color: var(--border-brand); box-shadow: var(--sh-card-hover); transform: translateY(-2px); }
-.kcard-ico { width: 44px; height: 44px; border-radius: 11px; background: var(--brand-50); }
-.kcard-txt b { font-size: 14.5px; }
-.kcard-hl b { color: var(--brand); }
-
 .sim-grid { gap: 18px; }
 .sim-card { border-radius: var(--r-card); padding: 20px; box-shadow: var(--sh-card); border: 1px solid var(--border); }
 .sim-head { margin-bottom: 12px; }
@@ -336,12 +326,6 @@ table.tbl tbody tr:hover { background: #FAFBFE; }
 .sim-brief { font-size: 12.5px; color: var(--ink-500); flex: 1; }
 .sim-foot { margin-top: 16px; }
 .sim-budget { font-size: 12.5px; }
-
-/* 知识卡片（详情） */
-.kcard-top { padding: 16px 18px 14px; border-bottom: 1px solid var(--ink-100); }
-.kcard-name { font-size: 15.5px; }
-.kcard-sec { padding: 13px 18px; border-bottom: 1px solid var(--ink-100); }
-.kcard-sec h5 { color: var(--ink-400); }
 
 /* 课程阅读器 */
 .reader-layout { gap: 24px; }
