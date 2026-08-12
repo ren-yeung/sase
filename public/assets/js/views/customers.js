@@ -60,7 +60,7 @@ var Customers = (function () {
       '<div class="bc-actions">' +
         '<a class="btn btn-primary" href="#/customer/new">' + ui.icon('plus', 18) + '<span>新建背调</span></a>' +
         '<a class="btn btn-ghost" href="#/aiconfig">' + ui.icon('gear', 18) + '<span>AI 模型配置</span></a>' +
-        '<span class="bc-hint">演示数据 · 已内置 4 家样本；AI 背调需启动本地服务并配置模型，未配置则回退模板。配置入口见上方「AI 模型配置」。</span>' +
+        '<span class="bc-hint">演示数据 · 已内置 6 家网络安全头部厂商样本；AI 背调需启动本地服务并配置模型，未配置则回退模板。配置入口见上方「AI 模型配置」。</span>' +
       '</div>' +
       '<section class="sec"><div class="sec-head"><h2>' + ui.icon('search', 18) + '客户池快速选择</h2></div><div class="pool-row">' + pool + '</div></section>' +
       '<section class="sec"><div class="sec-head"><h2>我的客户</h2><span class="sec-sub">' + (DB.customers || []).length + ' 家</span></div><div class="cust-grid">' + cards + '</div></section>' +

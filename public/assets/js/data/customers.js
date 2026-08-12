@@ -396,10 +396,12 @@ DB.customers = [
   }
 ];
 
-/* 待背调的客户池（快速选择用） */
+/* 待背调的客户池（快速选择用）：国内真实网络安全头部厂商 */
 DB.customerPool = [
-  { name: '鲜享连锁餐饮管理有限公司', industry: '连锁餐饮', region: '上海' },
-  { name: '远洋数字商贸（深圳）有限公司', industry: '跨境电商', region: '深圳' },
-  { name: '恒锐装备制造集团股份有限公司', industry: '智能制造', region: '苏州' },
-  { name: '康泰医疗投资管理有限公司', industry: '医疗健康', region: '杭州' }
+  { name: '奇安信科技集团股份有限公司', industry: '网络安全', region: '北京' },
+  { name: '启明星辰信息技术集团股份有限公司', industry: '网络安全', region: '北京' },
+  { name: '绿盟科技集团股份有限公司', industry: '网络安全', region: '北京' },
+  { name: '三六零安全科技股份有限公司', industry: '网络安全', region: '北京' },
+  { name: '深信服科技股份有限公司', industry: '网络安全', region: '深圳' },
+  { name: '新华三信息安全技术有限公司', industry: '网络安全', region: '杭州' }
 ];
