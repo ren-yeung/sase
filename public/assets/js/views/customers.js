@@ -404,13 +404,25 @@ var Customers = (function () {
   }
 
   /* 深度背调：在初步背调基础上调用大模型（DeepSeek 联网检索）补全全部章节 */
-  function deepResearch(id) {
-    var c = custById(id); if (!c) return;
-    App.shell.setContent(
-      '<div class="calc-loading-ui" style="min-height:52vh">' +
-        '<div class="c-loader"><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="lab">AI</span></div>' +
-        '<div class="calc-loading-hint">AI 深度背调中（DeepSeek 联网检索 + 天眼查核验），约 30–90 秒，请耐心等待…</div>' +
-      '</div>', '深度背调中');
+  function deepResearch(e) {
+    var id = e.getAttribute('data-id');
+    var c = custById(id); if (!c) { ui.toast('未找到该客户记录', 'warn'); return; }
+
+    // 按钮立即变成 mini AI 涟漪加载样式
+    e.classList.add('btn-loading');
+    e.disabled = true;
+    e.innerHTML = '<span class="btn-mini-loader"><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span></span><span class="btn-loading-txt">查询中…</span>';
+
+    // 在当前报告页顶部显示查询中提示（不离开页面）
+    var hintId = 'deep-loading-hint-' + id;
+    var oldHint = document.getElementById(hintId);
+    if (oldHint) oldHint.remove();
+    var hint = document.createElement('div');
+    hint.id = hintId;
+    hint.className = 'deep-loading-hint';
+    hint.innerHTML = '<div class="deep-loading-inner"><span class="btn-mini-loader"><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span></span><span>AI 深度背调查询中（DeepSeek 联网检索 + 天眼查核验），约 30–90 秒，请耐心等待…</span></div>';
+    var rpHead = document.querySelector('.rp-head');
+    if (rpHead) rpHead.parentNode.insertBefore(hint, rpHead.nextSibling);
 
     fetch('/api/baidiao', {
       method: 'POST',
@@ -419,6 +431,7 @@ var Customers = (function () {
     })
       .then(function (r) { return r.json(); })
       .then(function (resp) {
+        var hintEl = document.getElementById(hintId); if (hintEl) hintEl.remove();
         if (resp && resp.ok && resp.report) {
           c.report = resp.report;
           c.preliminary = false;
@@ -437,6 +450,7 @@ var Customers = (function () {
         }
       })
       .catch(function (err) {
+        var hintEl = document.getElementById(hintId); if (hintEl) hintEl.remove();
         ui.toast('深度背调连接失败：' + (err && err.message ? err.message : '未知错误') + '，已返回初步报告', 'warn');
         openReport(id);
       });
