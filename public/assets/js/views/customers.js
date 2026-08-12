@@ -322,7 +322,7 @@ var Customers = (function () {
         '<div class="rp-title"><h1 class="page-title">' + ui.esc(c.name) + '</h1>' +
           '<div class="rp-meta">' + ui.icon('building', 14) + ui.esc(c.industry) + ' · ' + ui.esc(c.region) + ' · 跟进 ' + ui.esc(c.owner) + ' · ' + ui.esc(c.stage) + '</div>' +
           '<div class="rp-tags">' + (c.tags || []).map(function (t) { return ui.tag(t, 'default'); }).join('') + '</div>' +
-          (c.generated ? '<div class="rp-gen">' + (c.ai ? (c.tycNote && c.tycNote.indexOf('已接入天眼查') >= 0 ? '✅ 天眼查权威工商已核验 · AI 联网检索合成' : (c.sources && c.sources.length ? 'AI 联网检索合成 · 基于公开资料生成，请核对来源' : 'AI 合成 · 内容由大模型生成，仅供参考请核对')) : '演示模板生成 · 非真实企业数据') + '</div>' : '') +
+          (c.realData ? '<div class="rp-gen rp-gen-real">✅ 工商基础信息（法人 / 注册资本 / 成立日期 / 地址 / 人员 / 上市代码）来自天眼查权威核验；下方业务、合规、风险、决策链、需求与切入建议为结合公开资料与行业经验的销售情报分析，供内部参考，落地前请复核。</div>' : (c.generated ? '<div class="rp-gen">' + (c.ai ? (c.tycNote && c.tycNote.indexOf('已接入天眼查') >= 0 ? '✅ 天眼查权威工商已核验 · AI 联网检索合成' : (c.sources && c.sources.length ? 'AI 联网检索合成 · 基于公开资料生成，请核对来源' : 'AI 合成 · 内容由大模型生成，仅供参考请核对')) : '演示模板生成 · 非真实企业数据') + '</div>' : '')) +
         '</div>' +
         '<div class="rp-head-actions">' +
           '<button class="btn btn-ghost" data-onclick="Customers.saveRecord" data-id="' + c.id + '">' + ui.icon('star', 16) + '加入跟进</button>' +
