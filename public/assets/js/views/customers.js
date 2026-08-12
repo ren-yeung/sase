@@ -60,7 +60,7 @@ var Customers = (function () {
       '<div class="bc-actions">' +
         '<a class="btn btn-primary" href="#/customer/new">' + ui.icon('plus', 18) + '<span>新建背调</span></a>' +
         '<a class="btn btn-ghost" href="#/aiconfig">' + ui.icon('gear', 18) + '<span>AI 模型配置</span></a>' +
-        '<span class="bc-hint">演示数据 · 已内置 6 家网络安全头部厂商样本；AI 背调需启动本地服务并配置模型，未配置则回退模板。配置入口见上方「AI 模型配置」。</span>' +
+        '<span class="bc-hint">背调分两步：① 新建即「初步背调」——仅调天眼查 MCP 查工商信息（需配置 TYC_KEY，秒级完成）；② 进入客户详情点「深度背调」——调 DeepSeek 联网检索补全全部章节（需配置 LLM_API_KEY）。内置 6 家网络安全头部厂商样本可直接查看完整报告。</span>' +
       '</div>' +
       '<section class="sec"><div class="sec-head"><h2>' + ui.icon('search', 18) + '客户池快速选择</h2></div><div class="pool-row">' + pool + '</div></section>' +
       '<section class="sec"><div class="sec-head"><h2>我的客户</h2><span class="sec-sub">' + (DB.customers || []).length + ' 家</span></div><div class="cust-grid">' + cards + '</div></section>' +
@@ -80,8 +80,8 @@ var Customers = (function () {
           '<div class="card-body">' +
             '<div class="field"><label>公司名称</label><input class="input" id="bc-name" placeholder="如：广东天耘科技有限公司" value="' + ui.esc(name) + '"></div>' +
             '<div class="field"><label>已知信息 / 补充（选填）</label><textarea class="input" id="bc-extra" rows="5" placeholder="如：客户刚完成 B 轮融资、近期在招网络工程师、现有 MPLS 年底到期、老板最关心海外访问卡顿…\n\n💡 建议：把天眼查/企查查的工商信息复制粘贴到这里，可大幅提高企业画像准确度。示例：\n企业名称：广东天耘科技有限公司\n法定代表人：戴煜\n注册资本：2498.243485万人民币\n成立日期：2014-04-19\n注册地址：广州市黄埔区联和街道开泰大道28号1701-1707房\n参保人数：160"></textarea></div>' +
-      '<div class="wizard-tip wizard-tip-strong">⚠️ 重要：AI 联网检索对企业画像的工商字段（法人、注册资本、成立日期、地址等）容易出错。若未在上方粘贴天眼查/企查查等权威数据，生成后请务必人工复核，或直接把这些信息填入「已知信息」框。</div>' +
-            '<div class="wizard-btns"><button class="btn btn-primary" data-onclick="Customers.generate">' + ui.icon('spark', 18) + '<span>生成背调报告</span></button></div>' +
+      '<div class="wizard-tip wizard-tip-strong">背调分两步：① 提交后立即生成「初步背调」——仅调用天眼查 MCP 核验工商信息（法人/注册资本/成立日期/地址/人员），秒级完成；② 进入客户详情后点「深度背调」才会调用 AI（DeepSeek 联网检索）补全业务/合规/风险/决策链/需求/切入建议。若想把已知信息带入深度背调，可填在下方「已知信息」框。</div>' +
+            '<div class="wizard-btns"><button class="btn btn-primary" data-onclick="Customers.generate">' + ui.icon('spark', 18) + '<span>生成初步背调</span></button></div>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -105,13 +105,13 @@ var Customers = (function () {
     var name = (document.getElementById('bc-name').value || '').trim();
     var extra = (document.getElementById('bc-extra') ? document.getElementById('bc-extra').value : '').trim();
     if (!name) { ui.toast('请填写公司名称', 'warn'); return; }
-    var payload = { name: name, industry: '', region: '', extra: extra };
+    var payload = { name: name, industry: '', region: '', extra: extra, mode: 'preliminary' };
 
     // 加载态（复用品牌涟漪 c-loader）
     App.shell.setContent(
       '<div class="calc-loading-ui" style="min-height:52vh">' +
-        '<div class="c-loader"><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="lab">AI</span></div>' +
-        '<div class="calc-loading-hint">AI 正在生成客户背调报告，约 10–30 秒…</div>' +
+        '<div class="c-loader"><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="lab">TYC</span></div>' +
+        '<div class="calc-loading-hint">天眼查工商核验中（初步背调，仅查工商信息），约 3–8 秒…</div>' +
       '</div>', '生成中');
 
     fetch('/api/baidiao', {
@@ -121,13 +121,13 @@ var Customers = (function () {
     })
       .then(function (r) { return r.json(); })
       .then(function (resp) {
-        if (resp && resp.ok && resp.report) buildFromAI(resp.report, payload, resp.sources, resp.searchNote, resp.tycNote);
-        else { fallbackGenerate(payload, resp && resp.error ? resp.error : '服务未返回有效报告'); ui.toast('AI 生成失败：' + (resp && resp.error ? resp.error : '未知错误') + '，已生成占位报告', 'warn'); }
+        if (resp && resp.ok && resp.report) buildFromAI(resp.report, payload, resp.sources, resp.searchNote, resp.tycNote, resp.preliminary);
+        else { fallbackGenerate(payload, resp && resp.error ? resp.error : '服务未返回有效报告'); ui.toast('初步背调失败：' + (resp && resp.error ? resp.error : '未知错误') + '，已生成占位报告', 'warn'); }
       })
       .catch(function (err) { fallbackGenerate(payload, err && err.message ? err.message : '网络/服务连接失败'); ui.toast('服务连接失败：' + (err && err.message ? err.message : '未知错误') + '，已生成占位报告', 'warn'); });
   }
 
-  function buildFromAI(report, payload, sources, searchNote, tycNote) {
+  function buildFromAI(report, payload, sources, searchNote, tycNote, preliminary) {
     var score = Number(report.score) || 0;
     var intent = score >= 85 ? 'high' : score >= 70 ? 'mid' : 'low';
     var c = {
@@ -136,13 +136,15 @@ var Customers = (function () {
       short: payload.name.length > 4 ? payload.name.slice(0, 4) : payload.name,
       industry: payload.industry,
       region: payload.region || '未知',
-      stage: 'AI 背调',
+      stage: preliminary ? '初步背调' : 'AI 背调',
       owner: (App.store.user() || {}).name || '我',
       intent: intent,
       amount: 0,
-      tags: ['AI 背调'],
+      tags: preliminary ? ['初步背调'] : ['AI 背调'],
       generated: true,
-      ai: true,
+      ai: !preliminary,
+      preliminary: !!preliminary,
+      extra: payload.extra || '',
       sources: sources || [],
       searchNote: searchNote || '',
       tycNote: tycNote || '',
@@ -150,7 +152,8 @@ var Customers = (function () {
     };
     genCache[c.id] = c;
     App.store.addBcRecord({ id: c.id, name: c.name, industry: c.industry, region: c.region, score: score, at: Date.now(), report: report, sources: sources || [] });
-    if (searchNote) ui.toast('已生成（注意：' + searchNote + '）', 'warn');
+    if (preliminary) ui.toast('初步背调完成（仅天眼查工商信息）', 'success');
+    else if (searchNote) ui.toast('已生成（注意：' + searchNote + '）', 'warn');
     else ui.toast('AI 联网背调报告已生成', 'success');
     location.hash = '#/customer/' + c.id;
   }
@@ -328,9 +331,9 @@ var Customers = (function () {
     }).join('');
 
     // 7 需求预测
-    var s7 = App.charts.funnel((r.demand || []).map(function (d) {
+    var s7 = (r.demand && r.demand.length) ? App.charts.funnel(r.demand.map(function (d) {
       return { label: d.name, value: d.fit, color: 'brand' };
-    }), { rowH: 48 });
+    }), { rowH: 48 }) : '';
     var demList = (r.demand || []).map(function (d) {
       return '<div class="dem-item"><span class="dem-pri">#' + d.pri + '</span><b>' + ui.esc(d.name) + '</b><span class="dem-fit">匹配 ' + d.fit + '%</span><div class="dem-reason">' + ui.esc(d.reason) + '</div></div>';
     }).join('');
@@ -363,11 +366,12 @@ var Customers = (function () {
         '<div class="rp-title"><h1 class="page-title">' + ui.esc(c.name) + '</h1>' +
           '<div class="rp-meta">' + ui.icon('building', 14) + ui.esc(c.industry) + ' · ' + ui.esc(c.region) + ' · 跟进 ' + ui.esc(c.owner) + ' · ' + ui.esc(c.stage) + '</div>' +
           '<div class="rp-tags">' + (c.tags || []).map(function (t) { return ui.tag(t, 'default'); }).join('') + '</div>' +
-          (c.fallback ? '<div class="rp-gen rp-gen-warn">⚠️ 生成失败：AI 服务未返回有效报告（' + ui.esc(c.searchNote || '未知原因') + '）。下方为占位模板，所有字段均为空，非真实数据，请检查 AI 配置后重试。</div>' : (c.realData ? '<div class="rp-gen rp-gen-real">✅ 工商基础信息（法人 / 注册资本 / 成立日期 / 地址 / 人员 / 上市代码）来自天眼查权威核验；下方业务、合规、风险、决策链、需求与切入建议为结合公开资料与行业经验的销售情报分析，供内部参考，落地前请复核。</div>' : (c.generated ? '<div class="rp-gen">' + (c.ai ? (c.tycNote && c.tycNote.indexOf('已接入天眼查') >= 0 ? '✅ 天眼查权威工商已核验 · AI 联网检索合成' : (c.sources && c.sources.length ? 'AI 联网检索合成 · 基于公开资料生成，请核对来源' : 'AI 合成 · 内容由大模型生成，仅供参考请核对')) : '演示模板生成 · 非真实企业数据') + '</div>' : ''))) +
+          (c.fallback ? '<div class="rp-gen rp-gen-warn">⚠️ 生成失败：AI 服务未返回有效报告（' + ui.esc(c.searchNote || '未知原因') + '）。下方为占位模板，所有字段均为空，非真实数据，请检查 AI 配置后重试。</div>' : (c.preliminary ? '<div class="rp-gen rp-gen-prelim">ℹ️ 初步背调完成（仅天眼查工商信息）：法人 / 注册资本 / 成立日期 / 经营状态 / 人员规模 / 注册地址已由天眼查权威核验。业务、合规、风险、决策链、需求、切入建议等章节尚未生成，点右上角「深度背调」由 AI 联网检索补全。</div>' : (c.realData ? '<div class="rp-gen rp-gen-real">✅ 工商基础信息（法人 / 注册资本 / 成立日期 / 地址 / 人员 / 上市代码）来自天眼查权威核验；下方业务、合规、风险、决策链、需求与切入建议为结合公开资料与行业经验的销售情报分析，供内部参考，落地前请复核。</div>' : (c.generated ? '<div class="rp-gen">' + (c.ai ? (c.tycNote && c.tycNote.indexOf('已接入天眼查') >= 0 ? '✅ 天眼查权威工商已核验 · AI 联网检索合成' : (c.sources && c.sources.length ? 'AI 联网检索合成 · 基于公开资料生成，请核对来源' : 'AI 合成 · 内容由大模型生成，仅供参考请核对')) : '演示模板生成 · 非真实企业数据') + '</div>' : '')))) +
         '</div>' +
         '<div class="rp-head-actions">' +
+          (c.preliminary ? '<button class="btn btn-primary" data-onclick="Customers.deepResearch" data-id="' + c.id + '">' + ui.icon('spark', 16) + '深度背调</button>' : '') +
           '<button class="btn btn-ghost" data-onclick="Customers.saveRecord" data-id="' + c.id + '">' + ui.icon('star', 16) + '加入跟进</button>' +
-          '<a class="btn btn-primary" href="#/recommend/' + c.id + '">' + ui.icon('recommend', 16) + '生成推介方案</a>' +
+          '<a class="btn ' + (c.preliminary ? 'btn-ghost' : 'btn-primary') + '" href="#/recommend/' + c.id + '">' + ui.icon('recommend', 16) + '生成推介方案</a>' +
         '</div>' +
       '</div>' +
       '<div class="rp-nav">' + nav + '</div>' +
@@ -399,7 +403,46 @@ var Customers = (function () {
     ui.toast('已加入跟进列表', 'success');
   }
 
-  return { render: render, wizard: wizard, startNew: startNew, generate: generate, openReport: openReport, openHist: openHist, saveRecord: saveRecord, scrollSec: scrollSec };
+  /* 深度背调：在初步背调基础上调用大模型（DeepSeek 联网检索）补全全部章节 */
+  function deepResearch(id) {
+    var c = custById(id); if (!c) return;
+    App.shell.setContent(
+      '<div class="calc-loading-ui" style="min-height:52vh">' +
+        '<div class="c-loader"><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="ring"></span><span class="lab">AI</span></div>' +
+        '<div class="calc-loading-hint">AI 深度背调中（DeepSeek 联网检索 + 天眼查核验），约 30–90 秒，请耐心等待…</div>' +
+      '</div>', '深度背调中');
+
+    fetch('/api/baidiao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: c.name, industry: c.industry, region: c.region, extra: c.extra || '', mode: 'deep' })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (resp) {
+        if (resp && resp.ok && resp.report) {
+          c.report = resp.report;
+          c.preliminary = false;
+          c.stage = 'AI 背调';
+          c.tags = ['AI 背调'];
+          c.ai = true;
+          c.sources = resp.sources || [];
+          c.searchNote = resp.searchNote || '';
+          c.tycNote = resp.tycNote || '';
+          if (resp.deep) c.deep = true;
+          ui.toast('深度背调完成', 'success');
+          openReport(id);
+        } else {
+          ui.toast('深度背调失败：' + (resp && resp.error ? resp.error : '未知错误') + '，已返回初步报告', 'warn');
+          openReport(id);
+        }
+      })
+      .catch(function (err) {
+        ui.toast('深度背调连接失败：' + (err && err.message ? err.message : '未知错误') + '，已返回初步报告', 'warn');
+        openReport(id);
+      });
+  }
+
+  return { render: render, wizard: wizard, startNew: startNew, generate: generate, openReport: openReport, openHist: openHist, saveRecord: saveRecord, deepResearch: deepResearch, scrollSec: scrollSec };
 })();
 window.Customers = Customers;
 

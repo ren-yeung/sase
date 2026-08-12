@@ -496,6 +496,78 @@ async function doFetchTYC(name, rt) {
   return out;
 }
 
+/* ---------- 初步背调：仅用天眼查工商数据生成报告（不调大模型，秒级、免费版可跑） ---------- */
+function buildPreliminaryReport(name, tycRaw) {
+  const ext = tycExtract(String(tycRaw || ''));
+  const na = '待深度背调';
+  let realStaff = 0;
+  if (ext.staff) {
+    const n = parseInt(String(ext.staff).replace(/[^0-9]/g, ''), 10);
+    if (!isNaN(n) && n > 0) realStaff = n;
+  }
+  let capitalStr = ext.capital || '';
+  if (ext.paid && capitalStr) capitalStr += '（实缴：' + ext.paid + '）';
+  const staffVal = ext.staff || '';
+  const metrics = [
+    { idx: 1, name: '中国办公室/分支/分厂/门店数量', value: na, type: '未找到', confidence: '低', year: '', source: '天眼查工商基础信息未含' },
+    { idx: 2, name: '海外办公室/分支/分厂/门店数量', value: na, type: '未找到', confidence: '低', year: '', source: '' },
+    { idx: 3, name: '海外业务涉及国家或城市', value: na, type: '未找到', confidence: '低', year: '', source: '' },
+    { idx: 4, name: '全公司真实人数', value: staffVal ? staffVal : na, type: staffVal ? '事实' : '未找到', confidence: staffVal ? '高' : '低', year: '', source: '天眼查（参保/人员规模）' },
+    { idx: 5, name: '全公司需要上外网人数', value: na, type: '未找到', confidence: '低', year: '', source: '' },
+    { idx: 6, name: '全公司 IT 人数（不含研发）', value: na, type: '未找到', confidence: '低', year: '', source: '' },
+    { idx: 7, name: '注册资本/实缴资本', value: capitalStr || na, type: capitalStr ? '事实' : '未找到', confidence: capitalStr ? '高' : '低', year: '', source: '天眼查官方 MCP' },
+    { idx: 8, name: '累计融资是否超过 1 亿元', value: na, type: '未找到', confidence: '低', year: '', source: '' },
+    { idx: 9, name: '国内营收/海外营收', value: na, type: '未找到', confidence: '低', year: '', source: '' },
+    { idx: 10, name: '企业官网公开邮箱（仅 1 个）', value: na, type: '未找到', confidence: '低', year: '', source: '' },
+    { idx: 11, name: '企业官网公开总机（仅 1 个）', value: na, type: '未找到', confidence: '低', year: '', source: '' }
+  ];
+  const report = {
+    score: 0,
+    scoreLabel: '初步（仅工商）',
+    profile: {
+      fullName: name,
+      short: name.length > 4 ? name.slice(0, 4) : name,
+      credit: ext.creditCode || na,
+      founded: ext.founded || na,
+      capital: capitalStr || na,
+      type: ext.type || na,
+      status: ext.status || na,
+      legal: ext.legal || na,
+      staff: staffVal ? (staffVal.indexOf('人') >= 0 ? staffVal : staffVal + '人') : na,
+      address: ext.address || na,
+      branches: na
+    },
+    realStaff: realStaff,
+    industryTag: '',
+    business: { main: na, position: na, moves: [], signals: [] },
+    itstack: { inferred: [], contracts: [] },
+    compliance: { items: [] },
+    risk: [],
+    chain: [],
+    demand: [],
+    entry: { window: na, topic: na, why: '初步背调仅含天眼查工商基础信息；业务/需求/切入建议需点击「深度背调」由 AI 联网检索补全。', first: na, actions: [] },
+    gaps: [
+      '当前为初步背调，仅含天眼查工商基础信息（法人/注册资本/成立日期/经营状态/人员规模/注册地址）',
+      '业务与行业、IT 与安全现状、合规要求、风险信号、决策链、安全需求、推荐切入点 等章节尚未生成',
+      '点击报告右上角「深度背调」即可调用 AI（DeepSeek 联网检索）补全上述所有章节'
+    ],
+    generatedAt: new Date().toLocaleString('zh-CN'),
+    preliminary: true
+  };
+  // 若解析到真实人数，按行业系数估算上外网/IT 人数（行业未知时跳过）
+  try {
+    const hc = calcHeadcount(realStaff, '', '');
+    if (hc.ok) {
+      metrics.forEach(function (m) {
+        if (m.idx === 5) { m.value = String(hc.internet); m.type = '估算'; m.confidence = '中'; m.source = '行业系数自动估算（' + hc.tag + ' × ' + (hc.rates.internet * 100) + '%）'; }
+        if (m.idx === 6) { m.value = String(hc.it); m.type = '估算'; m.confidence = '中'; m.source = '行业系数自动估算（' + hc.tag + ' × ' + (hc.rates.it * 100) + '%）'; }
+      });
+    }
+  } catch (e) {}
+  report.metrics = metrics;
+  return report;
+}
+
 /* ---------- 请求分发（被 functions/api/[[path]].js 调用） ---------- */
 async function handleApi(pathname, method, body, env) {
   method = (method || 'GET').toUpperCase();
@@ -572,11 +644,27 @@ async function handleApi(pathname, method, body, env) {
 
   if (pathname === '/api/baidiao' && method === 'POST') {
     const rt = await getRuntime(env);
-    if (!rt.LLM_API_KEY) {
-      return { status: 200, json: { ok: false, error: '未配置模型：请在 Cloudflare 项目设置配置 LLM_API_KEY（或在「AI 配置」页填写并保存）' } };
-    }
     let payload = body || {};
+    const mode = (payload.mode === 'preliminary') ? 'preliminary' : 'deep';
     try {
+      /* 初步背调：仅调用天眼查 MCP 拉工商信息，不调大模型，秒级完成、免费版可跑 */
+      if (mode === 'preliminary') {
+        if (!rt.TYC_KEY) {
+          return { status: 200, json: { ok: false, error: '初步背调需要天眼查 Key：请在 Cloudflare 环境变量 TYC_KEY 中配置（免费注册 ai.tianyancha.com 开通 MCP 服务）。' } };
+        }
+        let tycRaw = null;
+        try {
+          tycRaw = await doFetchTYC(payload.name, rt);
+        } catch (te) {
+          return { status: 200, json: { ok: false, error: '天眼查工商拉取失败：' + formatError(te) } };
+        }
+        const report = buildPreliminaryReport(payload.name, tycRaw);
+        return { status: 200, json: { ok: true, report: report, preliminary: true, model: null, sources: [], searchNote: '', tycNote: '已接入天眼查权威工商数据' } };
+      }
+      /* 深度背调：DeepSeek 联网检索 + 天眼查 MCP + 大模型合成（耗时较长） */
+      if (!rt.LLM_API_KEY) {
+        return { status: 200, json: { ok: false, error: '未配置模型：请在 Cloudflare 项目设置配置 LLM_API_KEY（或在「AI 配置」页填写并保存）' } };
+      }
       let grounded = null, sources = [], searchNote = '';
       let tycRaw = null, tycNote = '';
       const _prov = rt.SEARCH_PROVIDER;
@@ -615,7 +703,7 @@ async function handleApi(pathname, method, body, env) {
       } catch (e) {}
       return {
         status: 200,
-        json: { ok: true, report: report, model: rt.LLM_MODEL, sources: sources, searchNote: searchNote, tycNote: tycNote }
+        json: { ok: true, report: report, preliminary: false, model: rt.LLM_MODEL, sources: sources, searchNote: searchNote, tycNote: tycNote }
       };
     } catch (err) {
       return { status: 200, json: { ok: false, error: formatError(err) } };
