@@ -72,21 +72,13 @@ var Customers = (function () {
   /* ---------- 向导 ---------- */
   function wizard() {
     var name = pending ? pending.name : '';
-    var ind = pending ? pending.ind : '';
-    var region = pending ? pending.region : '';
-    var inds = ['连锁餐饮', '跨境电商', '智能制造', '医疗健康', '金融', '教育', '其他'];
-    var indOpts = inds.map(function (i) { return '<option' + (i === ind ? ' selected' : '') + '>' + i + '</option>'; }).join('');
     var html = '' +
       '<a class="lnk-back" href="#/customer">' + ui.icon('arrowl', 16) + '返回背调列表</a>' +
       '<div class="wizard">' +
-        '<div class="wizard-steps"><span class="ws on">1 输入信息</span><span class="ws">2 自动生成</span><span class="ws">3 查看报告</span></div>' +
-        '<div class="card"><div class="card-head">' + ui.icon('search', 18) + '新建客户背调</div>' +
+      '<div class="wizard-steps"><span class="ws on">1 输入信息</span><span class="ws">2 自动生成</span><span class="ws">3 查看报告</span></div>' +
+      '<div class="card"><div class="card-head">' + ui.icon('search', 18) + '新建客户背调</div>' +
           '<div class="card-body">' +
-            '<div class="field"><label>公司名称</label><input class="input" id="bc-name" placeholder="如：鲜享连锁餐饮管理有限公司" value="' + ui.esc(name) + '"></div>' +
-            '<div class="grid g2">' +
-              '<div class="field"><label>所属行业</label><select class="select" id="bc-ind">' + indOpts + '</select></div>' +
-              '<div class="field"><label>所在地区</label><input class="input" id="bc-region" placeholder="如：上海市" value="' + ui.esc(region) + '"></div>' +
-            '</div>' +
+            '<div class="field"><label>公司名称</label><input class="input" id="bc-name" placeholder="如：广东天耘科技有限公司" value="' + ui.esc(name) + '"></div>' +
             '<div class="field"><label>已知信息 / 补充（选填）</label><textarea class="input" id="bc-extra" rows="5" placeholder="如：客户刚完成 B 轮融资、近期在招网络工程师、现有 MPLS 年底到期、老板最关心海外访问卡顿…\n\n💡 建议：把天眼查/企查查的工商信息复制粘贴到这里，可大幅提高企业画像准确度。示例：\n企业名称：广东天耘科技有限公司\n法定代表人：戴煜\n注册资本：2498.243485万人民币\n成立日期：2014-04-19\n注册地址：广州市黄埔区联和街道开泰大道28号1701-1707房\n参保人数：160"></textarea></div>' +
       '<div class="wizard-tip wizard-tip-strong">⚠️ 重要：AI 联网检索对企业画像的工商字段（法人、注册资本、成立日期、地址等）容易出错。若未在上方粘贴天眼查/企查查等权威数据，生成后请务必人工复核，或直接把这些信息填入「已知信息」框。</div>' +
             '<div class="wizard-btns"><button class="btn btn-primary" data-onclick="Customers.generate">' + ui.icon('spark', 18) + '<span>生成背调报告</span></button></div>' +
@@ -98,7 +90,7 @@ var Customers = (function () {
   }
 
   function startNew(e) {
-    pending = { name: e.getAttribute('data-name'), ind: e.getAttribute('data-ind'), region: e.getAttribute('data-region') };
+    pending = { name: e.getAttribute('data-name') };
     location.hash = '#/customer/new';
   }
 
@@ -111,11 +103,9 @@ var Customers = (function () {
 
   function generate() {
     var name = (document.getElementById('bc-name').value || '').trim();
-    var ind = document.getElementById('bc-ind').value;
-    var region = (document.getElementById('bc-region').value || '').trim();
     var extra = (document.getElementById('bc-extra') ? document.getElementById('bc-extra').value : '').trim();
     if (!name) { ui.toast('请填写公司名称', 'warn'); return; }
-    var payload = { name: name, industry: ind, region: region, extra: extra };
+    var payload = { name: name, industry: '', region: '', extra: extra };
 
     // 加载态（复用品牌涟漪 c-loader）
     App.shell.setContent(
