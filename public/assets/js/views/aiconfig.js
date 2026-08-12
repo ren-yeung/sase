@@ -29,7 +29,7 @@ var AIConfig = (function () {
     var html = '' +
       ui.pageHead('AI 模型配置', '配置用于「客户一键背调」的大模型（OpenAI 兼容协议）。配置仅保存在本地服务端，绝不上传浏览器或第三方。') +
       '<div class="ai-cfg-wrap">' +
-        '<div class="ai-state" id="ai-state"><span class="ai-state-dot"></span><span id="ai-state-txt">正在检测本地服务…</span></div>' +
+        '<div class="ai-state" id="ai-state"><span class="ai-state-dot"></span><span id="ai-state-txt">正在检测服务…</span></div>' +
         '<div class="card"><div class="card-head">' + ui.icon('gear', 18) + '模型参数</div><div class="card-body">' +
           '<div class="field"><label>接口地址（Base URL）</label><input class="input" id="ai-base" placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1"></div>' +
           '<div class="field"><label>API Key</label><input class="input" id="ai-key" type="password" placeholder="填写你的模型服务商密钥" autocomplete="off"></div>' +
@@ -55,9 +55,9 @@ var AIConfig = (function () {
         '<div class="ai-result" id="ai-result" style="display:none"></div>' +
         '<div class="card"><div class="card-head">' + ui.icon('bulb', 18) + '使用说明</div><div class="card-body">' +
           '<ul class="ai-help-list">' +
-            '<li>本页面仅在「启动本地服务」后可保存：在原型目录运行 <code>node server/server.js</code>，浏览器访问 <b>http://localhost:4173/</b>。</li>' +
-            '<li>配置保存在服务端 <code>server/config.json</code>，<b>立即生效、无需重启</b>；若已存在 <code>server/.env</code>，UI 配置优先级更高。</li>' +
-            '<li>API Key 只保存在本地服务端，<b>不会进入浏览器、不会上传</b>。请勿提交到任何代码仓库。</li>' +
+            '<li><b>本地运行：</b>在原型目录运行 <code>node server/server.js</code>，浏览器访问 <b>http://localhost:4173/</b>。配置保存在服务端 <code>server/config.json</code>，立即生效、无需重启。</li>' +
+            '<li><b>云端运行（当前域名）：</b>配置由 Cloudflare 环境变量 / Secrets 提供，页面显示「云端服务（Cloudflare）已连接」。页面上「保存配置」在云端仅做校验、不持久化（未绑 KV 时），如需改配置请去 Cloudflare 控制台修改 Secrets。</li>' +
+            '<li>API Key 只保存在服务端 / Secrets，<b>不会进入浏览器、不会上传</b>。请勿提交到任何代码仓库。</li>' +
             '<li>未配置模型时，客户背调会自动回退到行业模板；配置并测试通过后，背调改为大模型真实合成。</li>' +
           '</ul>' +
         '</div></div>' +
@@ -106,23 +106,36 @@ var AIConfig = (function () {
       .catch(function () { state.connected = false; renderState(); });
   }
 
+  function isLocalhost() {
+    var h = location.hostname || '';
+    return h === 'localhost' || h === '127.0.0.1' || h === '[::1]';
+  }
+
+  function serviceLabel() {
+    return isLocalhost() ? '本地服务' : '云端服务（Cloudflare）';
+  }
+
   function renderState() {
     var el = document.getElementById('ai-state');
     if (!el) return;
     var txt = document.getElementById('ai-state-txt');
     if (!state.connected) {
       el.className = 'ai-state off';
-      txt.textContent = '未连接本地服务：请先运行 node server/server.js，并通过 http://localhost:4173/ 访问';
+      if (isLocalhost()) {
+        txt.textContent = '未连接本地服务：请先运行 node server/server.js，并通过 http://localhost:4173/ 访问';
+      } else {
+        txt.textContent = '未连接云端服务：请确认 Cloudflare Pages 已部署，或检查网络 / DNS';
+      }
       return;
     }
     if (state.configured) {
       el.className = 'ai-state ok';
       var searchTxt = state.search === 'perplexity' ? ' · 已开启联网检索(Perplexity)' : state.search === 'deepseek' ? ' · 已开启联网检索(DeepSeek)' : ' · 未开启检索（可能编造）';
       var tycTxt = state.tycEnabled ? ' · 已接入天眼查权威工商' : '';
-      txt.textContent = '本地服务已连接 · 模型已配置（' + (state.model || '') + ' · ' + (state.keyMask || '') + '）' + searchTxt + tycTxt;
+      txt.textContent = serviceLabel() + '已连接 · 模型已配置（' + (state.model || '') + ' · ' + (state.keyMask || '') + '）' + searchTxt + tycTxt;
     } else {
       el.className = 'ai-state warn';
-      txt.textContent = '本地服务已连接 · 尚未配置模型，背调将回退模板';
+      txt.textContent = serviceLabel() + '已连接 · 尚未配置模型，背调将回退模板';
     }
   }
 
