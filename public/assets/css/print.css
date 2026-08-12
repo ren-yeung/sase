@@ -1,0 +1,41 @@
+/* 打印样式 - 方案书 / 报价单 / 背调报告 导出 PDF */
+
+@media print {
+  @page { size: A4; margin: 16mm 14mm; }
+
+  body { background: #fff !important; font-size: 10.5pt; color: #000; }
+  .sidebar, .topbar, .sidebar-scrim, .toast-zone,
+  .page-head-actions, .no-print, .tabs, .pills,
+  .btn, .modal-foot, .x-btn { display: none !important; }
+
+  .shell { display: block; }
+  .main { display: block; }
+  .content { padding: 0 !important; max-width: none !important; }
+
+  .card { border: 1px solid #D5D9E0 !important; box-shadow: none !important; break-inside: avoid; }
+  .card-head { background: #F5F7FA !important; }
+
+  .print-only { display: block !important; }
+  .print-page-break { break-before: page; page-break-before: always; }
+  .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+  table.tbl { font-size: 9.5pt; }
+  table.tbl th { background: #F0F3F7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .tag, .stat-value, .bar-fill, .doc-cover-band, .logo-mark {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  a { color: #000 !important; text-decoration: none; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+
+  .doc-cover { height: 240mm; break-after: page; }
+  .grid { display: block; }
+  .grid > * { margin-bottom: 10px; }
+  .g2, .g3, .g4 { display: grid !important; }
+  .g2 { grid-template-columns: 1fr 1fr !important; }
+  .g3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .g4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+.print-only { display: none; }

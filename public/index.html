@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>OgCloud 赋能平台 · 登录</title>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="assets/css/modules.css">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-visual">
+      <span class="glow"></span>
+      <div class="login-visual-inner">
+        <div class="login-stats-brand"><span class="logo-mark" id="lv-brand"></span><b id="lv-name">OgCloud</b></div>
+        <h1>一张网，<br>连通<em>全球业务</em></h1>
+        <p>网络安全产品赋能平台 · 学习、背调、推介、管理一体。本原型为内部演示，数据为模拟样本。</p>
+        <div class="login-stats" id="lv-stats"></div>
+      </div>
+    </div>
+
+    <div class="login-panel">
+      <div class="login-brand">
+        <span class="logo-mark" id="lp-brand"></span>
+        <div><strong id="lp-name">OgCloud 赋能平台</strong><small>内部赋能 · 高保真原型</small></div>
+      </div>
+      <h2 class="login-title">选择角色进入</h2>
+      <p class="login-sub">演示原型免密登录，按角色加载对应工作界面</p>
+      <div class="role-list" id="role-list"></div>
+      <div class="login-foot">提示：进入后可随时在右上角切换角色或退出。数据保存在本地浏览器（localStorage）。</div>
+    </div>
+  </div>
+
+  <script src="assets/js/data/products.js"></script>
+  <script src="assets/js/data/courses.js"></script>
+  <script src="assets/js/data/quiz.js"></script>
+  <script src="assets/js/data/customers.js"></script>
+  <script src="assets/js/data/users.js"></script>
+  <script src="assets/js/core/store.js"></script>
+  <script src="assets/js/core/ui.js"></script>
+  <script src="assets/js/core/charts.js"></script>
+  <script src="assets/js/core/pricing.js"></script>
+  <script>
+    (function () {
+      var co = DB.company || { name: 'OgCloud' };
+      document.getElementById('lv-name').textContent = co.name;
+      document.getElementById('lp-name').textContent = co.name + ' 赋能平台';
+      document.getElementById('lv-brand').textContent = co.name.slice(0, 1);
+      document.getElementById('lp-brand').textContent = co.name.slice(0, 1);
+      var stats = document.getElementById('lv-stats');
+      (co.facts || []).slice(0, 4).forEach(function (f) {
+        var d = document.createElement('div');
+        d.className = 'login-stat';
+        d.innerHTML = '<strong>' + f.k + '</strong><span>' + f.v + '</span>';
+        stats.appendChild(d);
+      });
+
+      var list = document.getElementById('role-list');
+      Object.keys(DB.roles).forEach(function (rid) {
+        var r = DB.roles[rid];
+        var u = DB.defaultUserForRole(rid);
+        var card = document.createElement('button');
+        card.className = 'role-card';
+        card.setAttribute('data-role', rid);
+        card.innerHTML =
+          '<span class="avatar" style="background:var(--' + r.color + ');color:#fff">' + App.ui.avatar(u.name) + '</span>' +
+          '<span class="role-card-info"><strong>' + r.name + ' · ' + App.ui.esc(u.name) + '</strong><span>' + App.ui.esc(r.desc) + '</span></span>' +
+          '<span class="role-check">' + App.ui.icon('check', 16) + '</span>';
+        card.addEventListener('click', function () {
+          App.store.setUser(DB.defaultUserForRole(rid));
+          location.href = 'app.html';
+        });
+        list.appendChild(card);
+      });
+    })();
+  </script>
+</body>
+</html>

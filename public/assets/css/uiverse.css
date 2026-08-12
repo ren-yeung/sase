@@ -1,0 +1,157 @@
+/* =============================================================
+   OgCloud 赋能平台 · Uiverse 灵感组件库
+   灵感来自 github.com/uiverse-io/galaxy（MIT），按 OgCloud 后台品牌色
+   重上色后集成进原型。类名统一以 c- 前缀，避免与现有 .btn/.tag/.stat 冲突。
+   组件令牌使用 --ui- 前缀，不与全局设计令牌相互覆盖。
+   ============================================================= */
+:root{
+  --ui-brand:#1890FF;
+  --ui-brand-deep:#0b5fec;
+  --ui-accent:#40DFD0;
+  --ui-success:#13CE66;
+  --ui-ink:#303133;
+  --ui-ink-2:#606266;
+  --ui-muted:#909399;
+  --ui-line:#dcdfe6;
+  --ui-surface:#ffffff;
+  --ui-grad:linear-gradient(90deg,#0b5fec,#40dfd0);
+  --ui-grad-soft:linear-gradient(135deg,#0b5fec 0%,#15808a 100%);
+  --ui-shadow:0 8px 24px rgba(11,95,236,.12);
+  --ui-shadow-hover:0 14px 32px rgba(11,95,236,.22);
+}
+
+/* 通用：c-btn 家族在 <a> 与 <button> 上表现一致 */
+.c-btn,.c-btn-solid,.c-btn-ghost{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  text-decoration:none;cursor:pointer;font-family:inherit;line-height:1.3;
+}
+
+/* ===================== 1. 按钮 ===================== */
+.c-btn{
+  padding:11px 26px;font-size:15px;font-weight:600;color:var(--ui-brand-deep);
+  border:1.5px solid rgba(24,144,255,.35);border-radius:8px;outline:none;
+  box-shadow:0 6px 14px rgba(11,95,236,.12), inset 0 2px 4px rgba(255,255,255,.6);
+  backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);
+  position:relative;overflow:hidden;background-color:rgba(255,255,255,.7);
+  transition:box-shadow .4s ease, transform .4s ease, color .3s ease;
+  background-image:linear-gradient(to top, rgba(64,223,208,.9), rgba(24,144,255,.75));
+  background-repeat:no-repeat;background-position:center bottom;background-size:100% 0%;
+}
+.c-btn:hover{box-shadow:0 8px 18px rgba(11,95,236,.22), inset 0 3px 5px rgba(255,255,255,.7)}
+.c-btn:active{animation:ogFill .4s ease forwards;color:#fff;
+  box-shadow:0 3px 8px rgba(11,95,236,.32), inset 0 2px 4px rgba(255,255,255,.25)}
+@keyframes ogFill{0%{background-size:100% 0%;transform:translateY(0)}100%{background-size:100% 100%;transform:translateY(2px)}}
+
+.c-btn-solid{padding:11px 26px;font-size:15px;font-weight:600;color:#fff;border:none;border-radius:8px;cursor:pointer;
+  background:var(--ui-grad);box-shadow:0 6px 16px rgba(11,95,236,.3);
+  transition:transform .2s ease, box-shadow .2s ease, filter .2s ease}
+.c-btn-solid:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(11,95,236,.4);filter:brightness(1.04)}
+.c-btn-solid:active{transform:translateY(1px)}
+.c-btn-ghost{padding:11px 26px;font-size:15px;font-weight:600;color:var(--ui-brand-deep);background:#fff;
+  border:1.5px solid var(--ui-brand);border-radius:8px;cursor:pointer;transition:background .2s ease,box-shadow .2s ease}
+.c-btn-ghost:hover{background:rgba(24,144,255,.08);box-shadow:0 4px 12px rgba(24,144,255,.16)}
+
+/* ===================== 2. 开关 ===================== */
+.c-switch{font-size:17px;position:relative;display:inline-block;width:3.5em;height:2em}
+.c-switch input{opacity:0;width:0;height:0}
+.c-switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
+  background-color:#c0c4cc;border:1px solid #c0c4cc;transition:.4s;border-radius:32px;outline:none}
+.c-switch .slider:before{position:absolute;content:"";height:2rem;width:2rem;border-radius:50%;
+  outline:2px solid #c0c4cc;left:-1px;bottom:-1px;background-color:#fff;transition:transform .25s ease-in-out 0s}
+.c-switch .slider-icon{opacity:0;height:12px;width:12px;stroke-width:8;position:absolute;z-index:999;
+  stroke:#fff;right:60%;top:30%;transition:right ease-in-out .3s,opacity ease-in-out .15s}
+.c-switch input:checked + .slider{background-color:var(--ui-brand);border-color:var(--ui-brand)}
+.c-switch input:checked + .slider .slider-icon{opacity:1;right:20%}
+.c-switch input:checked + .slider:before{transform:translateX(1.5em);outline-color:var(--ui-brand-deep)}
+
+/* 模块开关行的布局（配合 CRM 模块配置） */
+.mod-row{display:flex;align-items:center;gap:14px;font-size:13.5px;color:var(--ink-800)}
+.mod-row .mod-name{flex:1;font-weight:500}
+.mod-state{font-size:12px}
+.mod-state.on{color:var(--ui-success)}
+.mod-state.off{color:var(--ui-muted)}
+
+/* ===================== 3. 聚焦发光输入框 ===================== */
+.c-input{position:relative;width:280px;display:inline-flex}
+.c-input svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--ui-muted)}
+.c-input input{width:100%;height:44px;padding:0 14px 0 40px;font-size:15px;color:var(--ui-ink);
+  border:1.5px solid var(--ui-line);border-radius:10px;background:#fff;outline:none;font-family:inherit;
+  transition:box-shadow .3s ease,border-color .3s ease,transform .3s ease}
+.c-input input::placeholder{color:var(--ui-muted)}
+.c-input input:focus{border-color:var(--ui-brand);box-shadow:0 0 0 3px rgba(24,144,255,.18),0 2px 8px rgba(24,144,255,.12);transform:translateY(-1px)}
+
+/* ===================== 4. 状态徽标 / 标签 ===================== */
+.c-badge{position:relative;display:inline-flex;align-items:center;gap:7px;padding:6px 15px;color:#fff;
+  font-weight:600;font-size:13px;border-radius:999px;background:var(--ui-grad);
+  box-shadow:0 4px 12px rgba(11,95,236,.28);user-select:none;line-height:1.2}
+.c-badge .dot{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.4)}
+.c-badge.alt{background:#fff;color:var(--ui-brand-deep);border:1.5px solid var(--ui-brand);box-shadow:none}
+.c-badge.alt .dot{background:var(--ui-brand);box-shadow:0 0 0 3px rgba(24,144,255,.2)}
+
+/* ===================== 5. 玻璃卡片（悬浮抬升） ===================== */
+.c-card{position:relative;width:100%;height:148px;border-radius:14px;background:#fff;
+  box-shadow:var(--ui-shadow);overflow:hidden;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease}
+.c-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:var(--ui-shadow-hover)}
+.c-card .c1,.c-card .c2{position:absolute;width:96px;height:96px;border-radius:50%;filter:blur(2px);opacity:.5;
+  animation:ogFloat 3s ease-in-out infinite alternate-reverse}
+.c-card .c1{top:-26px;left:-26px;background:radial-gradient(circle at 30% 30%, #1890FF, #0b5fec)}
+.c-card .c2{bottom:-26px;right:-26px;background:radial-gradient(circle at 30% 30%, #40DFD0, #0b5fec);animation-name:ogFloat2}
+.c-card .body{position:relative;z-index:2;padding:20px}
+.c-card .body .k{font-size:12.5px;color:var(--ui-ink-2)}
+.c-card .body .v{font-size:30px;font-weight:800;color:var(--ui-ink);margin-top:4px;
+  background:var(--ui-grad-soft);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.c-card .body .d{font-size:12px;color:var(--ui-success);margin-top:6px;font-weight:600}
+@keyframes ogFloat{to{transform:translateY(-10px)}}
+@keyframes ogFloat2{to{transform:translateY(10px)}}
+
+/* ===================== 6. 品牌涟漪加载 ===================== */
+.c-loader{--size:150px;--duration:2s;position:relative;width:var(--size);height:var(--size)}
+.c-loader .ring{position:absolute;border-radius:50%;border-top:2px solid var(--ui-brand);
+  background:rgba(24,144,255,.06);animation:ogRipple var(--duration) infinite ease-in-out}
+.c-loader .ring:nth-child(1){inset:40%;z-index:5}
+.c-loader .ring:nth-child(2){inset:30%;z-index:4;border-color:rgba(24,144,255,.7);animation-delay:.2s}
+.c-loader .ring:nth-child(3){inset:20%;z-index:3;border-color:rgba(24,144,255,.5);animation-delay:.4s}
+.c-loader .ring:nth-child(4){inset:10%;z-index:2;border-color:rgba(24,144,255,.32);animation-delay:.6s}
+.c-loader .ring:nth-child(5){inset:0%;z-index:1;border-color:rgba(24,144,255,.18);animation-delay:.8s}
+.c-loader .lab{position:absolute;inset:0;display:grid;place-content:center;color:var(--ui-brand);font-weight:700;font-size:13px}
+@keyframes ogRipple{0%{transform:scale(1)}50%{transform:scale(1.28)}100%{transform:scale(1)}}
+
+/* 试算结果区的加载占位 */
+.calc-loading-ui{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:44px 20px;text-align:center}
+.calc-loading-hint{color:var(--ui-muted);font-size:12.5px}
+
+/* ===================== 7. 趣味气泡复选框 ===================== */
+.c-bubble{font-size:18px}
+.c-bubble .bubble,.c-bubble .bubble:before,.c-bubble .bubble:after{transition-duration:.2s}
+.c-bubble .bubble,.c-bubble .bubble:after{border-radius:50%}
+.c-bubble .bubble{
+  background-image:radial-gradient(8% 8% at 22% 28%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+    radial-gradient(8% 8% at 23% 27%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+    radial-gradient(8% 8% at 24% 26%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+    radial-gradient(8% 8% at 25% 25%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+    radial-gradient(8% 8% at 26% 24%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+    radial-gradient(8% 8% at 27% 23%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+    radial-gradient(8% 8% at 28% 22%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%);
+  box-shadow:0 -0.06em 0.1em hsl(212,90%,100%) inset,0 -0.15em 0.4em hsl(212,90%,45%) inset,
+    0 0.05em 0.05em hsl(212,90%,45%) inset,0.05em 0 0.1em hsl(212,90%,100%) inset,
+    -0.05em 0 0.1em hsl(212,90%,100%) inset,0 0.1em 0.4em hsl(212,90%,60%) inset;
+  cursor:pointer;position:relative;width:3em;height:3em;transform-style:preserve-3d;
+  transition-property:box-shadow, transform, width, height;
+  will-change:transform;-webkit-appearance:none;appearance:none;z-index:0;flex:none}
+.c-bubble .bubble:before,.c-bubble .bubble:after{content:"";display:block;position:absolute}
+.c-bubble .bubble:before{border-radius:0.75em;box-shadow:0 0 0 0.5em hsl(0,0%,100%) inset;
+  filter:drop-shadow(0.6em 0.6em 4px hsla(0,0%,0%,0.2));top:50%;left:50%;width:1.5em;height:1.5em;
+  transform:translate3d(-50%,-50%,-1px);z-index:-1}
+.c-bubble .bubble:after{background:radial-gradient(100% 100% at center,hsla(0,0%,0%,0) 35%,hsla(0,0%,0%,0.2) 48%,hsla(0,0%,0%,0) 50%);
+  filter:blur(4px);top:0.6em;left:0.6em;width:100%;height:100%;transform:translate3d(0,0,-1px);z-index:-2}
+.c-bubble .bubble:focus,.c-bubble .bubble:hover{transform:scale(1.1);outline:none}
+.c-bubble .bubble:focus:active,.c-bubble .bubble:hover:active{width:3.6em;height:2.4em}
+.c-bubble .bubble:checked{
+  box-shadow:0 -0.06em 0.1em hsl(174,90%,100%) inset,0 -0.15em 0.4em hsl(174,90%,45%) inset,
+    0 0.05em 0.05em hsl(174,90%,45%) inset,0.05em 0 0.1em hsl(174,90%,100%) inset,
+    -0.05em 0 0.1em hsl(174,90%,100%) inset,0 0.1em 0.4em hsl(174,90%,60%) inset}
+.c-bubble .bubble:checked:before{border-radius:0.25em;width:0.5em}
+
+/* 选配模块：气泡复选框 + 文案 */
+.bubble-item{display:inline-flex;align-items:center;gap:10px;margin-right:14px;cursor:pointer;vertical-align:middle}
+.bubble-lbl{font-size:12.5px;color:var(--ui-ink-2)}

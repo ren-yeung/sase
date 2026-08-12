@@ -1,0 +1,18 @@
+# 本地 `wrangler pages dev` 用的环境变量样例。
+# 复制为同目录下的 .dev.vars 并填入真实值（.dev.vars 已被 .gitignore 忽略，不会提交）。
+# 注意：.dev.vars 仅用于本地开发；生产请在 Cloudflare 控制台设置环境变量/Secrets。
+
+# 必填：模型服务商密钥（OpenAI 兼容协议）
+LLM_API_KEY=你的_DeepSeek_或_通义千问_Key
+
+# 选填（有默认值，可省略）
+# LLM_BASE_URL=https://api.deepseek.com/v1
+# LLM_MODEL=deepseek-v4-pro
+# LLM_TIMEOUT=90000
+# SEARCH_PROVIDER=deepseek
+
+# 选填：天眼查官方 MCP Key（根治工商信息不准；去 ai.tianyancha.com 免费开通）
+TYC_KEY=mcpk2_xxxxxxxx
+
+# 选填：天眼查 MCP 地址（默认即可）
+# TYC_MCP_URL=https://mcp.tianyancha.com/v1

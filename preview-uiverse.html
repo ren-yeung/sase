@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OgCloud 原型 · Uiverse 灵感素材库（品牌重上色）</title>
+<style>
+  /* ===== OgCloud 后台品牌令牌 ===== */
+  :root{
+    --brand:#1890FF;
+    --brand-deep:#0b5fec;
+    --accent:#40DFD0;
+    --success:#13CE66;
+    --warn:#FFBA00;
+    --danger:#FF4949;
+    --ink:#303133;
+    --ink-2:#606266;
+    --muted:#909399;
+    --line:#dcdfe6;
+    --bg:#F5F7FA;
+    --surface:#ffffff;
+    --grad:linear-gradient(90deg,#0b5fec,#40dfd0);
+    --grad-soft:linear-gradient(135deg,#0b5fec 0%,#15808a 100%);
+    --shadow:0 8px 24px rgba(11,95,236,.12);
+    --shadow-hover:0 14px 32px rgba(11,95,236,.22);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);
+  }
+  /* 顶栏（与 OgCloud 后台一致） */
+  .topbar{
+    height:56px;display:flex;align-items:center;gap:14px;padding:0 22px;
+    background:var(--grad);color:#fff;box-shadow:0 2px 12px rgba(11,95,236,.25);
+    position:sticky;top:0;z-index:10;
+  }
+  .topbar .mark{
+    width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.18);
+    display:grid;place-content:center;font-weight:800;font-size:15px;
+  }
+  .topbar .t{font-weight:700;font-size:15px;letter-spacing:.3px}
+  .topbar .sub{font-size:12px;opacity:.85;margin-left:6px;font-weight:400}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 22px 60px}
+  .lead{margin:6px 0 22px}
+  .lead h1{font-size:20px;margin:0 0 6px}
+  .lead p{margin:0;color:var(--ink-2);font-size:13.5px;line-height:1.7}
+  .lead .hint{margin-top:10px;font-size:12.5px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:10px 14px}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+
+  .demo{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  .demo .stage{
+    min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    padding:28px 22px;background:
+      radial-gradient(circle at 1px 1px, rgba(11,95,236,.06) 1px, transparent 0) 0 0/22px 22px,
+      linear-gradient(180deg,#fff, #fafbff);
+  }
+  .demo .meta{border-top:1px solid var(--line);padding:14px 16px;background:#fbfcfe}
+  .demo .meta .name{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+  .demo .meta .tag{font-size:11px;font-weight:600;color:var(--brand-deep);background:rgba(24,144,255,.12);padding:2px 8px;border-radius:999px}
+  .demo .meta .src{font-size:11.5px;color:var(--muted);margin:4px 0 0}
+  .demo .meta .use{font-size:12.5px;color:var(--ink-2);margin:8px 0 0;line-height:1.6}
+  .demo .meta .use b{color:var(--brand-deep)}
+
+  /* ===================== 1. 按钮 ===================== */
+  .c-btn{
+    cursor:pointer;padding:11px 26px;font-size:15px;font-weight:600;color:var(--brand-deep);
+    border:1.5px solid rgba(24,144,255,.35);border-radius:8px;outline:none;
+    box-shadow:0 6px 14px rgba(11,95,236,.12), inset 0 2px 4px rgba(255,255,255,.6);
+    backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);
+    position:relative;overflow:hidden;background-color:rgba(255,255,255,.7);
+    transition:box-shadow .4s ease, transform .4s ease, color .3s ease;
+    background-image:linear-gradient(to top, rgba(64,223,208,.9), rgba(24,144,255,.75));
+    background-repeat:no-repeat;background-position:center bottom;background-size:100% 0%;
+  }
+  .c-btn:hover{box-shadow:0 8px 18px rgba(11,95,236,.22), inset 0 3px 5px rgba(255,255,255,.7)}
+  .c-btn:active{animation:ogFill .4s ease forwards;color:#fff;
+    box-shadow:0 3px 8px rgba(11,95,236,.32), inset 0 2px 4px rgba(255,255,255,.25)}
+  @keyframes ogFill{0%{background-size:100% 0%;transform:translateY(0)}100%{background-size:100% 100%;transform:translateY(2px)}}
+
+  .c-btn-solid{padding:11px 26px;font-size:15px;font-weight:600;color:#fff;border:none;border-radius:8px;cursor:pointer;
+    background:var(--grad);box-shadow:0 6px 16px rgba(11,95,236,.3);
+    transition:transform .2s ease, box-shadow .2s ease, filter .2s ease}
+  .c-btn-solid:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(11,95,236,.4);filter:brightness(1.04)}
+  .c-btn-solid:active{transform:translateY(1px)}
+  .c-btn-ghost{padding:11px 26px;font-size:15px;font-weight:600;color:var(--brand-deep);background:#fff;
+    border:1.5px solid var(--brand);border-radius:8px;cursor:pointer;transition:background .2s ease,box-shadow .2s ease}
+  .c-btn-ghost:hover{background:rgba(24,144,255,.08);box-shadow:0 4px 12px rgba(24,144,255,.16)}
+
+  /* ===================== 2. 开关 ===================== */
+  .c-switch{font-size:17px;position:relative;display:inline-block;width:3.5em;height:2em}
+  .c-switch input{opacity:0;width:0;height:0}
+  .c-switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
+    background-color:#c0c4cc;border:1px solid #c0c4cc;transition:.4s;border-radius:32px;outline:none}
+  .c-switch .slider:before{position:absolute;content:"";height:2rem;width:2rem;border-radius:50%;
+    outline:2px solid #c0c4cc;left:-1px;bottom:-1px;background-color:#fff;transition:transform .25s ease-in-out 0s}
+  .c-switch .slider-icon{opacity:0;height:12px;width:12px;stroke-width:8;position:absolute;z-index:999;
+    stroke:#fff;right:60%;top:30%;transition:right ease-in-out .3s,opacity ease-in-out .15s}
+  .c-switch input:checked + .slider{background-color:var(--brand);border-color:var(--brand)}
+  .c-switch input:checked + .slider .slider-icon{opacity:1;right:20%}
+  .c-switch input:checked + .slider:before{transform:translateX(1.5em);outline-color:var(--brand-deep)}
+
+  /* ===================== 3. 搜索输入框 ===================== */
+  .c-input{position:relative;width:280px}
+  .c-input svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted)}
+  .c-input input{width:100%;height:44px;padding:0 14px 0 40px;font-size:15px;color:var(--ink);
+    border:1.5px solid var(--line);border-radius:10px;background:#fff;outline:none;
+    transition:box-shadow .3s ease,border-color .3s ease,transform .3s ease}
+  .c-input input::placeholder{color:var(--muted)}
+  .c-input input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(24,144,255,.18),0 2px 8px rgba(24,144,255,.12);transform:translateY(-1px)}
+
+  /* ===================== 4. 徽标 / 标签 ===================== */
+  .c-badge{position:relative;display:inline-flex;align-items:center;gap:7px;padding:6px 15px;color:#fff;
+    font-weight:600;font-size:13px;border-radius:999px;background:var(--grad);
+    box-shadow:0 4px 12px rgba(11,95,236,.28);user-select:none}
+  .c-badge .dot{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.4)}
+  .c-badge.alt{background:#fff;color:var(--brand-deep);border:1.5px solid var(--brand);box-shadow:none}
+  .c-badge.alt .dot{background:var(--brand);box-shadow:0 0 0 3px rgba(24,144,255,.2)}
+
+  /* ===================== 5. 玻璃卡片（悬浮抬升） ===================== */
+  .c-card{position:relative;width:240px;height:148px;border-radius:14px;background:#fff;
+    box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease}
+  .c-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:var(--shadow-hover)}
+  .c-card .c1,.c-card .c2{position:absolute;width:96px;height:96px;border-radius:50%;filter:blur(2px);opacity:.5;
+    animation:ogFloat 3s ease-in-out infinite alternate-reverse}
+  .c-card .c1{top:-26px;left:-26px;background:radial-gradient(circle at 30% 30%, #1890FF, #0b5fec)}
+  .c-card .c2{bottom:-26px;right:-26px;background:radial-gradient(circle at 30% 30%, #40DFD0, #0b5fec);animation-name:ogFloat2}
+  .c-card .body{position:relative;z-index:2;padding:20px}
+  .c-card .body .k{font-size:12.5px;color:var(--ink-2)}
+  .c-card .body .v{font-size:30px;font-weight:800;color:var(--ink);margin-top:4px;
+    background:var(--grad-soft);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .c-card .body .d{font-size:12px;color:var(--success);margin-top:6px;font-weight:600}
+  @keyframes ogFloat{to{transform:translateY(-10px)}}
+  @keyframes ogFloat2{to{transform:translateY(10px)}}
+
+  /* ===================== 6. 加载动画（品牌涟漪） ===================== */
+  .c-loader{--size:150px;--duration:2s;position:relative;width:var(--size);height:var(--size)}
+  .c-loader .ring{position:absolute;border-radius:50%;border-top:2px solid var(--brand);
+    background:rgba(24,144,255,.06);animation:ogRipple var(--duration) infinite ease-in-out}
+  .c-loader .ring:nth-child(1){inset:40%;z-index:5}
+  .c-loader .ring:nth-child(2){inset:30%;z-index:4;border-color:rgba(24,144,255,.7);animation-delay:.2s}
+  .c-loader .ring:nth-child(3){inset:20%;z-index:3;border-color:rgba(24,144,255,.5);animation-delay:.4s}
+  .c-loader .ring:nth-child(4){inset:10%;z-index:2;border-color:rgba(24,144,255,.32);animation-delay:.6s}
+  .c-loader .ring:nth-child(5){inset:0%;z-index:1;border-color:rgba(24,144,255,.18);animation-delay:.8s}
+  .c-loader .lab{position:absolute;inset:0;display:grid;place-content:center;color:var(--brand);font-weight:700;font-size:13px}
+  @keyframes ogRipple{0%{transform:scale(1)}50%{transform:scale(1.28)}100%{transform:scale(1)}}
+
+  /* ===================== 7. 趣味气泡复选框 ===================== */
+  .c-bubble{font-size:18px}
+  .c-bubble label,.c-bubble .bubble{display:block;-webkit-tap-highlight-color:transparent}
+  .c-bubble label{animation:ogFloatB 4s ease-in-out infinite}
+  .c-bubble .bubble,.c-bubble .bubble:before,.c-bubble .bubble:after{transition-duration:.2s}
+  .c-bubble .bubble,.c-bubble .bubble:after{border-radius:50%}
+  .c-bubble .bubble{
+    background-image:radial-gradient(8% 8% at 22% 28%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+      radial-gradient(8% 8% at 23% 27%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+      radial-gradient(8% 8% at 24% 26%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+      radial-gradient(8% 8% at 25% 25%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+      radial-gradient(8% 8% at 26% 24%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+      radial-gradient(8% 8% at 27% 23%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%),
+      radial-gradient(8% 8% at 28% 22%,hsl(0,0%,100%) 45%,hsla(0,0%,100%,0) 50%);
+    box-shadow:0 -0.06em 0.1em hsl(212,90%,100%) inset,0 -0.15em 0.4em hsl(212,90%,45%) inset,
+      0 0.05em 0.05em hsl(212,90%,45%) inset,0.05em 0 0.1em hsl(212,90%,100%) inset,
+      -0.05em 0 0.1em hsl(212,90%,100%) inset,0 0.1em 0.4em hsl(212,90%,60%) inset;
+    cursor:pointer;position:relative;width:3em;height:3em;transform-style:preserve-3d;
+    transition-property:box-shadow, transform, width, height;
+    will-change:transform;-webkit-appearance:none;appearance:none;z-index:0}
+  .c-bubble .bubble:before,.c-bubble .bubble:after{content:"";display:block;position:absolute}
+  .c-bubble .bubble:before{border-radius:0.75em;box-shadow:0 0 0 0.5em hsl(0,0%,100%) inset;
+    filter:drop-shadow(0.6em 0.6em 4px hsla(0,0%,0%,0.2));top:50%;left:50%;width:1.5em;height:1.5em;
+    transform:translate3d(-50%,-50%,-1px);z-index:-1}
+  .c-bubble .bubble:after{background:radial-gradient(100% 100% at center,hsla(0,0%,0%,0) 35%,hsla(0,0%,0%,0.2) 48%,hsla(0,0%,0%,0) 50%);
+    filter:blur(4px);top:0.6em;left:0.6em;width:100%;height:100%;transform:translate3d(0,0,-1px);z-index:-2}
+  .c-bubble .bubble:focus,.c-bubble .bubble:hover{transform:scale(1.1);outline:none}
+  .c-bubble .bubble:focus:active,.c-bubble .bubble:hover:active{width:3.6em;height:2.4em}
+  .c-bubble .bubble:checked{
+    box-shadow:0 -0.06em 0.1em hsl(174,90%,100%) inset,0 -0.15em 0.4em hsl(174,90%,45%) inset,
+      0 0.05em 0.05em hsl(174,90%,45%) inset,0.05em 0 0.1em hsl(174,90%,100%) inset,
+      -0.05em 0 0.1em hsl(174,90%,100%) inset,0 0.1em 0.4em hsl(174,90%,60%) inset}
+  .c-bubble .bubble:checked:before{border-radius:0.25em;width:0.5em}
+  @keyframes ogFloatB{from,to{transform:translate(0,3%)}25%{transform:translate(-3%,0)}50%{transform:translate(0,-3%)}75%{transform:translate(3%,0)}}
+
+  .foot{max-width:1180px;margin:24px auto 0;padding:0 22px 50px;color:var(--muted);font-size:12px;line-height:1.7}
+  .foot code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--brand-deep)}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="mark">O</div>
+    <div class="t">OgCloud 销售赋能原型</div>
+    <div class="sub">· Uiverse 灵感素材库（已按后台品牌色重上色）</div>
+  </div>
+
+  <div class="wrap">
+    <div class="lead">
+      <h1>挑一些不错的样式给你看看 👀</h1>
+      <p>以下组件灵感来自 <b>Uiverse.io</b>（开源 MIT 协议），我从 galaxy 仓库按 CSS 动画/渐变/阴影等特征打分，筛掉了偏游戏/装饰向的（星空按钮、暗黑轨道加载、爱心点赞等），挑出适合 B 端销售赋能原型的几类，并按 OgCloud 后台品牌色（主蓝 <code style="background:#fff;border:1px solid #dcdfe6;border-radius:6px;padding:1px 6px;color:#0b5fec">#1890FF</code>、签名渐变 <code style="background:#fff;border:1px solid #dcdfe6;border-radius:6px;padding:1px 6px;color:#0b5fec">#0b5fec→#40dfd0</code>、浅色外壳）重新上色。</p>
+      <div class="hint">👉 你看中哪几个，告诉我编号或名字，我就按这个风格加进原型（按钮 / 开关 / 输入 / 徽标 / 卡片 / 加载 / 复选框）。不合适的直接跳过，我再换一批。</div>
+    </div>
+
+    <div class="grid">
+
+      <!-- 1. 按钮 -->
+      <div class="demo">
+        <div class="stage">
+          <button class="c-btn">开始学习</button>
+          <div style="display:flex;gap:12px">
+            <button class="c-btn-solid">立即体验</button>
+            <button class="c-btn-ghost">查看详情</button>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="name">按钮组 <span class="tag">Buttons</span></div>
+          <div class="src">灵感：Uiverse / BurgiSimon（glass 填充按钮）· alexruix（实心/描边）</div>
+          <div class="use"><b>适用：</b>课程卡片 CTA「开始学习」、模拟器「立即体验」、列表「查看详情」。主按钮点击时品牌渐变自下而上填充。</div>
+        </div>
+      </div>
+
+      <!-- 2. 开关 -->
+      <div class="demo">
+        <div class="stage">
+          <label class="c-switch">
+            <input type="checkbox" checked>
+            <span class="slider">
+              <svg class="slider-icon" viewBox="0 0 32 32"><path fill="none" d="m4 16.5 8 8 16-16"></path></svg>
+            </span>
+          </label>
+          <label class="c-switch">
+            <input type="checkbox">
+            <span class="slider">
+              <svg class="slider-icon" viewBox="0 0 32 32"><path fill="none" d="m4 16.5 8 8 16-16"></path></svg>
+            </span>
+          </label>
+        </div>
+        <div class="meta">
+          <div class="name">iOS 风格开关 <span class="tag">Toggle</span></div>
+          <div class="src">灵感：Uiverse / alexruix（silent-otter）</div>
+          <div class="use"><b>适用：</b>设置页「消息通知」「学习提醒」、功能开关。开启时滑块右移并露出对勾，轨道变品牌蓝。</div>
+        </div>
+      </div>
+
+      <!-- 3. 搜索输入 -->
+      <div class="demo">
+        <div class="stage">
+          <div class="c-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="搜索课程 / 资料 / 客户" />
+          </div>
+        </div>
+        <div class="meta">
+          <div class="name">聚焦发光输入框 <span class="tag">Input</span></div>
+          <div class="src">灵感：Uiverse / mRcOol7（focus glow）</div>
+          <div class="use"><b>适用：</b>顶部全局搜索栏、课程/客户筛选搜索。聚焦时边框变蓝 + 淡蓝光晕微抬升。</div>
+        </div>
+      </div>
+
+      <!-- 4. 徽标 -->
+      <div class="demo">
+        <div class="stage">
+          <span class="c-badge"><span class="dot"></span>NEW</span>
+          <span class="c-badge alt"><span class="dot"></span>热门</span>
+          <span class="c-badge">L4 高阶</span>
+        </div>
+        <div class="meta">
+          <div class="name">状态徽标 / 标签 <span class="tag">Badge</span></div>
+          <div class="src">灵感：Uiverse / elijahgummer（glass badge）</div>
+          <div class="use"><b>适用：</b>课程等级标签「L1–L4」、资料「NEW」、榜单「热门」。已改为品牌实心 + 描边两种，浅色页面也清晰。</div>
+        </div>
+      </div>
+
+      <!-- 5. 玻璃卡片 -->
+      <div class="demo">
+        <div class="stage">
+          <div class="c-card">
+            <div class="c1"></div><div class="c2"></div>
+            <div class="body">
+              <div class="k">本月新增客户</div>
+              <div class="v">1,284</div>
+              <div class="d">▲ 23.6% 环比</div>
+            </div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="name">悬浮抬升数据卡 <span class="tag">Card</span></div>
+          <div class="src">灵感：Uiverse / G4b413l（glass hover card）</div>
+          <div class="use"><b>适用：</b>数据看板小卡、讲师卡片。悬浮时整卡抬升放大，角落品牌光晕浮动。</div>
+        </div>
+      </div>
+
+      <!-- 6. 加载 -->
+      <div class="demo">
+        <div class="stage">
+          <div class="c-loader">
+            <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+            <div class="lab">加载中</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="name">品牌涟漪加载 <span class="tag">Loader</span></div>
+          <div class="src">灵感：Uiverse / Smit-Prajapati（ripple loader，已去暗底与 LOGO）</div>
+          <div class="use"><b>适用：</b>页面/区块加载、模拟器启动。多层品牌蓝圆环由内向外涟漪扩散。</div>
+        </div>
+      </div>
+
+      <!-- 7. 气泡复选框 -->
+      <div class="demo">
+        <div class="stage">
+          <div class="c-bubble">
+            <label><input type="checkbox" class="bubble" checked></label>
+            <label><input type="checkbox" class="bubble"></label>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="name">趣味气泡复选框 <span class="tag">Checkbox</span></div>
+          <div class="src">灵感：Uiverse / Nawsome（bubble checkbox，已改蓝→青）</div>
+          <div class="use"><b>适用：</b>多选筛选的趣味态（可选）。未选=蓝气泡，选中=青气泡并收成方块。偏活泼，看你是否要这味。</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="foot">
+    组件灵感来自 <b>Uiverse.io</b>（MIT 协议，仓库 <code>uiverse-io/galaxy</code>，12k+ stars）。本页仅作原型灵感参考，所有颜色已按 OgCloud 后台品牌令牌重上色，零构建、可直接双击打开。<br>
+    想加进原型 → 告诉我编号（1–7）或组件名；想换一批 → 我再从 galaxy 仓库按其他分类（如 Cards / loaders / 更多 Inputs）再筛一轮。
+  </div>
+</body>
+</html>

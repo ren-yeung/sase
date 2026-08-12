@@ -1,0 +1,25 @@
+# 本地大模型密钥 / 运行配置（切勿提交）
+server/.env
+server/config.json
+
+# 后端依赖（仅本地 Node 运行时需要，非前端）
+node_modules/
+
+# Cloudflare 本地开发产物与密钥
+.wrangler/
+.dev.vars
+
+# 项目本地记忆（不进仓库）
+.workbuddy/
+
+# 临时开发脚本 / 产物
+_*
+_pptx_text/
+
+# 与主线无关的遗留/演示文件（不进仓库、不部署）
+galaxy_src
+galaxy_tmp
+portal.html
+portal_assets
+preview-uiverse.html
+sample_baidiao_yasen.html

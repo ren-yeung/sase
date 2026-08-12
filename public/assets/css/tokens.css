@@ -1,0 +1,94 @@
+/* OgCloud 赋能平台 - 设计令牌
+   品牌色取自官网 www.ogcloud.com 图标源码 */
+
+:root {
+  /* 品牌主色 — OgCloud 后台门户实际色板 */
+  --brand: #1890FF;          /* 主按钮 / 链接（el-button--primary） */
+  --brand-hover: #0B5FEC;    /* 渐变起点 / hover */
+  --brand-active: #0A4FB5;
+  --brand-50: #E8F4FF;
+  --brand-100: #D6E9FF;
+  --brand-200: #AED4FF;
+  --brand-300: #7CB8FF;
+  --brand-600: #1890FF;
+  --brand-700: #0B5FEC;
+  --brand-900: #063B8E;
+  --grad-brand: linear-gradient(90deg, #0b5fec, #40dfd0); /* 后台签名渐变：蓝→青 */
+
+  /* 品牌强调色 - 青绿（后台点缀 #40DFD0） */
+  --accent: #40DFD0;
+  --accent-deep: #00B89E;
+  --accent-50: #E6F9F6;
+  --accent-100: #C9F5EF;
+  --accent-600: #00B89E;
+  --accent-800: #00705F;
+
+  /* 中性色（对齐 OgCloud 后台 Element 文本层级） */
+  --ink-900: #303133;
+  --ink-800: #303133;
+  --ink-700: #404A5C;
+  --ink-600: #606266;
+  --ink-500: #909399;
+  --ink-400: #B0B7C3;
+  --ink-300: #C0C4CC;
+  --ink-200: #DCDFE6;
+  --ink-100: #E4E7ED;
+  --ink-50: #F5F7FA;
+  --white: #FFFFFF;
+
+  /* 语义色（对齐 OgCloud 后台） */
+  --success: #13CE66;
+  --success-bg: #E7FAF0;
+  --warning: #FFBA00;
+  --warning-bg: #FFF8E6;
+  --danger: #FF4949;
+  --danger-bg: #FFEDED;
+  --info: #1890FF;
+  --info-bg: #E8F4FF;
+  --purple: #6544D9;
+  --purple-bg: #F0ECFD;
+
+  /* 表面（对齐 OgCloud 后台：浅色 + 浅薰衣草侧栏 #e4e6f2） */
+  --bg-page: #F5F7FA;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F2F6FC;
+  --bg-sidebar: #E4E6F2;
+  --bg-sidebar-hover: #D5D6E1;
+
+  /* 边框 */
+  --border: #E4E7ED;
+  --border-strong: #DCDFE6;
+  --border-brand: #A8CBFF;
+
+  /* 圆角 */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-full: 999px;
+
+  /* 阴影 */
+  --sh-xs: 0 1px 2px rgba(12, 18, 32, .05);
+  --sh-sm: 0 1px 3px rgba(12, 18, 32, .07), 0 1px 2px rgba(12, 18, 32, .04);
+  --sh-md: 0 4px 12px rgba(12, 18, 32, .08);
+  --sh-lg: 0 12px 32px rgba(12, 18, 32, .12);
+  --sh-brand: 0 4px 14px rgba(21, 116, 255, .25);
+
+  /* 字体 */
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --font-num: "SF Mono", "DIN Alternate", Consolas, "Roboto Mono", monospace;
+
+  /* 尺寸 */
+  --sidebar-w: 232px;
+  --sidebar-w-collapsed: 64px;
+  --topbar-h: 60px;
+  --content-max: 1400px;
+
+  /* 层级 */
+  --z-sidebar: 100;
+  --z-topbar: 90;
+  --z-dropdown: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+}

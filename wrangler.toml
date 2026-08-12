@@ -1,0 +1,20 @@
+name = "ogcloud-anquan"
+pages_build_output_dir = "public"
+compatibility_date = "2024-11-01"
+
+# ===== 非机密变量（可随仓库提交；机密请用 Secrets） =====
+[vars]
+LLM_BASE_URL = "https://api.deepseek.com/v1"
+LLM_MODEL = "deepseek-v4-pro"
+SEARCH_PROVIDER = "deepseek"
+
+# ===== 机密（API Key / 天眼查 Key）切勿写在这里或提交仓库 =====
+# 用 Cloudflare Secrets 设置（命令行或控制台）：
+#   npx wrangler pages secret put LLM_API_KEY
+#   npx wrangler pages secret put TYC_KEY
+# 本地用 `wrangler pages dev` 时，从 .dev.vars 读取（该文件已被 .gitignore 忽略）。
+#
+# 可选：让「AI 配置」页在云端也能"保存"
+#   在 Cloudflare 控制台创建一个 KV 命名空间，并在
+#   Pages 项目 Settings -> Functions -> KV namespace bindings 绑定为 CONFIG_KV。
+#   未绑定则 /api/config POST 仅做校验、不持久化（配置仍走环境变量/Secrets）。
