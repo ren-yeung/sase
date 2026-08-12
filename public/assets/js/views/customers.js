@@ -122,9 +122,9 @@ var Customers = (function () {
       .then(function (r) { return r.json(); })
       .then(function (resp) {
         if (resp && resp.ok && resp.report) buildFromAI(resp.report, payload, resp.sources, resp.searchNote, resp.tycNote);
-        else { fallbackGenerate(payload); ui.toast('AI 生成失败：' + (resp && resp.error ? resp.error : '未知错误') + '，已改用行业模板', 'warn'); }
+        else { fallbackGenerate(payload, resp && resp.error ? resp.error : '服务未返回有效报告'); ui.toast('AI 生成失败：' + (resp && resp.error ? resp.error : '未知错误') + '，已生成占位报告', 'warn'); }
       })
-      .catch(function () { fallbackGenerate(payload); ui.toast('未连接到本地服务，已改用行业模板生成', 'warn'); });
+      .catch(function (err) { fallbackGenerate(payload, err && err.message ? err.message : '网络/服务连接失败'); ui.toast('服务连接失败：' + (err && err.message ? err.message : '未知错误') + '，已生成占位报告', 'warn'); });
   }
 
   function buildFromAI(report, payload, sources, searchNote, tycNote) {
@@ -155,27 +155,78 @@ var Customers = (function () {
     location.hash = '#/customer/' + c.id;
   }
 
-  /* 模板回退：未配置模型 / 接口异常时使用（与之前行为一致） */
-  function fallbackGenerate(payload) {
+  /* 失败回退：AI 服务未返回有效报告时，生成一个占位报告，避免把其他企业的真实模板套用在当前公司 */
+  function makeFallbackReport(name) {
+    var now = new Date().toLocaleString('zh-CN');
+    var na = '—';
+    var placeholder = 'AI 服务未返回有效报告，未能生成真实内容。常见原因：\n1. Cloudflare 函数执行超时（免费版最长 30 秒，大模型联网检索可能超出）；\n2. AI 模型未配置或 Key 失效；\n3. 天眼查 MCP 服务暂时不可用。\n建议切换本地服务运行：node server/server.js，或在 AI 配置页检查 Key。';
+    return {
+      score: 0,
+      scoreLabel: '未生成',
+      intent: 'low',
+      profile: {
+        fullName: name,
+        short: name.length > 4 ? name.slice(0, 4) : name,
+        founded: na,
+        capital: na,
+        type: na,
+        status: na,
+        legal: na,
+        staff: na,
+        address: na,
+        branches: na
+      },
+      metrics: [
+        { idx: 1, name: '上市/融资阶段', value: na, type: '事实', confidence: '低', year: '', source: '未生成' },
+        { idx: 2, name: '分支机构/点位数', value: na, type: '事实', confidence: '低', year: '', source: '未生成' },
+        { idx: 3, name: '员工规模', value: na, type: '事实', confidence: '低', year: '', source: '未生成' },
+        { idx: 4, name: '海外办公/跨境访问需求', value: na, type: '事实', confidence: '低', year: '', source: '未生成' },
+        { idx: 5, name: '需要上外网的人数', value: na, type: '估算', confidence: '低', year: '', source: '未生成' },
+        { idx: 6, name: 'IT/网络/安全相关人员数', value: na, type: '估算', confidence: '低', year: '', source: '未生成' },
+        { idx: 7, name: '注册资本/实缴资本', value: na, type: '事实', confidence: '低', year: '', source: '未生成' },
+        { idx: 8, name: '行业安全合规要求', value: na, type: '事实', confidence: '低', year: '', source: '未生成' },
+        { idx: 9, name: '当前安全/网络供应商', value: na, type: '估算', confidence: '低', year: '', source: '未生成' },
+        { idx: 10, name: '合同到期/预算窗口', value: na, type: '估算', confidence: '低', year: '', source: '未生成' },
+        { idx: 11, name: '决策链关键角色', value: na, type: '估算', confidence: '低', year: '', source: '未生成' }
+      ],
+      business: { main: na, position: na, moves: [], signals: [] },
+      itstack: { inferred: [], contracts: [] },
+      compliance: { items: [] },
+      risk: [],
+      chain: [],
+      demand: [],
+      entry: { window: na, topic: na, why: placeholder, first: na, actions: [] },
+      gaps: ['AI 服务未返回有效报告', '下方为占位模板，非真实企业数据', '请检查 AI 配置后重试，或切换本地服务'],
+      generatedAt: now
+    };
+  }
+
+  /* 模板回退：未配置模型 / 接口异常时使用，不再复用「我的客户」中的真实厂商模板 */
+  function fallbackGenerate(payload, errMsg) {
     var name = payload.name, ind = payload.industry, region = payload.region;
-    var base = (DB.customers || [])[0];
-    if (ind.indexOf('餐饮') >= 0) base = DB.customers[0];
-    else if (ind.indexOf('跨境') >= 0) base = DB.customers[1];
-    else if (ind.indexOf('制造') >= 0) base = DB.customers[2];
-    else if (ind.indexOf('医疗') >= 0) base = DB.customers[3];
-    var clone = JSON.parse(JSON.stringify(base));
-    clone.id = 'gen_' + Date.now();
-    clone.name = name;
-    clone.short = name.length > 4 ? name.slice(0, 4) : name;
-    clone.industry = ind;
-    clone.region = region || '未知';
-    clone.owner = (App.store.user() || {}).name || '我';
-    clone.report.profile.fullName = name;
-    clone.report.generatedAt = new Date().toLocaleString('zh-CN');
-    clone.generated = true;
-    genCache[clone.id] = clone;
-    App.store.addBcRecord({ id: clone.id, name: name, industry: ind, region: region, score: clone.report.score, at: Date.now(), report: clone.report });
-    location.hash = '#/customer/' + clone.id;
+    var report = makeFallbackReport(name);
+    var c = {
+      id: 'gen_' + Date.now(),
+      name: name,
+      short: name.length > 4 ? name.slice(0, 4) : name,
+      industry: ind || '未知',
+      region: region || '未知',
+      stage: '生成失败',
+      owner: (App.store.user() || {}).name || '我',
+      intent: 'low',
+      amount: 0,
+      tags: ['生成失败'],
+      generated: true,
+      ai: false,
+      fallback: true,
+      sources: [],
+      searchNote: errMsg || 'AI 服务未返回有效报告',
+      tycNote: '',
+      report: report
+    };
+    genCache[c.id] = c;
+    App.store.addBcRecord({ id: c.id, name: name, industry: c.industry, region: c.region, score: 0, at: Date.now(), report: report });
+    location.hash = '#/customer/' + c.id;
   }
 
   /* ---------- 报告 ---------- */
@@ -312,7 +363,7 @@ var Customers = (function () {
         '<div class="rp-title"><h1 class="page-title">' + ui.esc(c.name) + '</h1>' +
           '<div class="rp-meta">' + ui.icon('building', 14) + ui.esc(c.industry) + ' · ' + ui.esc(c.region) + ' · 跟进 ' + ui.esc(c.owner) + ' · ' + ui.esc(c.stage) + '</div>' +
           '<div class="rp-tags">' + (c.tags || []).map(function (t) { return ui.tag(t, 'default'); }).join('') + '</div>' +
-          (c.realData ? '<div class="rp-gen rp-gen-real">✅ 工商基础信息（法人 / 注册资本 / 成立日期 / 地址 / 人员 / 上市代码）来自天眼查权威核验；下方业务、合规、风险、决策链、需求与切入建议为结合公开资料与行业经验的销售情报分析，供内部参考，落地前请复核。</div>' : (c.generated ? '<div class="rp-gen">' + (c.ai ? (c.tycNote && c.tycNote.indexOf('已接入天眼查') >= 0 ? '✅ 天眼查权威工商已核验 · AI 联网检索合成' : (c.sources && c.sources.length ? 'AI 联网检索合成 · 基于公开资料生成，请核对来源' : 'AI 合成 · 内容由大模型生成，仅供参考请核对')) : '演示模板生成 · 非真实企业数据') + '</div>' : '')) +
+          (c.fallback ? '<div class="rp-gen rp-gen-warn">⚠️ 生成失败：AI 服务未返回有效报告（' + ui.esc(c.searchNote || '未知原因') + '）。下方为占位模板，所有字段均为空，非真实数据，请检查 AI 配置后重试。</div>' : (c.realData ? '<div class="rp-gen rp-gen-real">✅ 工商基础信息（法人 / 注册资本 / 成立日期 / 地址 / 人员 / 上市代码）来自天眼查权威核验；下方业务、合规、风险、决策链、需求与切入建议为结合公开资料与行业经验的销售情报分析，供内部参考，落地前请复核。</div>' : (c.generated ? '<div class="rp-gen">' + (c.ai ? (c.tycNote && c.tycNote.indexOf('已接入天眼查') >= 0 ? '✅ 天眼查权威工商已核验 · AI 联网检索合成' : (c.sources && c.sources.length ? 'AI 联网检索合成 · 基于公开资料生成，请核对来源' : 'AI 合成 · 内容由大模型生成，仅供参考请核对')) : '演示模板生成 · 非真实企业数据') + '</div>' : ''))) +
         '</div>' +
         '<div class="rp-head-actions">' +
           '<button class="btn btn-ghost" data-onclick="Customers.saveRecord" data-id="' + c.id + '">' + ui.icon('star', 16) + '加入跟进</button>' +

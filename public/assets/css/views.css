@@ -334,6 +334,8 @@
 .rp-meta { font-size: 12.5px; color: var(--ink-500); display: flex; align-items: center; gap: 5px; margin: 4px 0; flex-wrap: wrap; }
 .rp-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .rp-gen { font-size: 11.5px; color: var(--warning); margin-top: 6px; }
+.rp-gen-real { color: #237804; }
+.rp-gen-warn { color: #cf1322; }
 .rp-head-actions { margin-left: auto; display: flex; gap: 10px; }
 .rp-nav { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 0; margin-bottom: 8px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg-page); z-index: 5; }
 .rp-nav-item { font-size: 12.5px; color: var(--ink-600); text-decoration: none; padding: 6px 12px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border); }
