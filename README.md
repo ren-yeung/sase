@@ -10,6 +10,17 @@
 
 ---
 
+## ✅ 当前进度
+
+| 步骤 | 状态 |
+| --- | --- |
+| 代码推送到 GitHub | ✅ 已完成 → `https://github.com/ren-yeung/sase`（分支 `main`） |
+| Cloudflare Pages 部署 | ⏳ 待你在控制台「连接 Git 仓库」（见 §3.3-A） |
+| 云端密钥 `LLM_API_KEY` / `TYC_KEY` | ⏳ 待你填（见 §3.2） |
+| 自定义域名 `sase.ccwu.cc` | ⏳ 待你绑（zone = `ccwu.cc`，见 §3.4） |
+
+---
+
 ## 一、目录结构
 
 ```
@@ -65,14 +76,13 @@ node server/server.js
 
 > 不想用命令行也可以：在 Cloudflare 控制台用「连接 Git 仓库」方式部署（见 3.3），密钥在控制台填。
 
-### 3.1 把代码推到 GitHub
+### 3.1 把代码推到 GitHub（✅ 已完成）
 
+代码已推送到 `https://github.com/ren-yeung/sase` 的 `main` 分支（2026-08-12）。若你后续改了代码要同步：
 ```bash
-git init
 git add -A
-git commit -m "OgCloud 销售赋能原型 + Cloudflare Functions 后端"
-git remote add origin https://github.com/<你的用户名>/<仓库名>.git
-git push -u origin main
+git commit -m "你的改动说明"
+git push origin main        # 之后 Cloudflare 自动重新部署
 ```
 > 提交前用 `git status` 确认没有 `server/.env`、`server/config.json`、`.dev.vars` 被加进来。
 
@@ -113,9 +123,11 @@ wrangler pages deploy public        # 部署静态站
 
 ### 3.4 绑定自有域名（加速 + HTTPS）
 
-Cloudflare → 你的 Pages 项目 → **Custom domains** → 输入你的子域名（如 `anquan.你的域名.com`）→
-按提示在域名 DNS 加一条 `CNAME` 指向 `<项目>.pages.dev`（Cloudflare 通常自动加好）。
-稍等证书签发（自动 HTTPS），访问你的域名即可。
+本项目的目标域名：**`sase.ccwu.cc`**（域名 zone = `ccwu.cc`，已在 Cloudflare 下）。
+
+Cloudflare → 你的 Pages 项目 → **Custom domains** → 输入 `sase.ccwu.cc` →
+按提示在 `ccwu.cc` 的 DNS 里加一条 `CNAME` 指向 `<项目>.pages.dev`（Cloudflare 通常自动加好）。
+稍等证书签发（自动 HTTPS），访问 `https://sase.ccwu.cc` 即可，且默认走 Cloudflare 全球加速。
 
 > 若走 Cloudflare 全球加速（CDN）：域名本身已在 CF，默认就是加速的；Pages 自带边缘缓存。
 
